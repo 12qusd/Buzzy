@@ -10,7 +10,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { CLIENT_API_URL, type BrowserFeedArticle, type FeedResponse } from '@/services/api';
+import { type BrowserFeedArticle, type FeedResponse } from '@/services/api';
 import { BrowserStoryCard } from '@/components/BrowserStoryCard';
 import { CategoryFilterBar } from '@/components/CategoryFilterBar';
 
@@ -54,9 +54,7 @@ export default function BrowserPage() {
         if (category) params.set('category', category);
         if (pageCursor) params.set('cursor', pageCursor);
 
-        const res = await fetch(`${CLIENT_API_URL}/api/articles/feed?${params.toString()}`, {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        const res = await fetch(`/api/feed?${params.toString()}`);
 
         if (!res.ok) {
           throw new Error(`API error ${res.status}`);
