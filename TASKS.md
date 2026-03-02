@@ -12,14 +12,14 @@ Each task is small enough to complete in a focused session, ordered by dependenc
   - [x] Subtask 0.1.b: Add `turbo.json` defining basic `build`, `lint`, `test`, and `dev` pipelines.
   - [x] Subtask 0.1.c: Create empty `apps/`, `packages/`, and `services/` directories.
 
-- [ ] Task 0.2: Bootstrap TypeScript configuration — Add root `tsconfig.base.json` and shared TS config patterns for TypeScript apps and packages.
-  - [ ] Subtask 0.2.a: Create `tsconfig.base.json` with shared compiler options.
-  - [ ] Subtask 0.2.b: Add minimal `tsconfig.json` files to each TypeScript workspace (apps and packages) extending the base config.
+- [x] Task 0.2: Bootstrap TypeScript configuration — Add root `tsconfig.base.json` and shared TS config patterns for TypeScript apps and packages. _(Completed: Created tsconfig.base.json with strict TypeScript 5.3 settings, added template tsconfig.json files for apps/ and packages/ directories, installed TypeScript, and verified configs work correctly.)_
+  - [x] Subtask 0.2.a: Create `tsconfig.base.json` with shared compiler options.
+  - [x] Subtask 0.2.b: Add minimal `tsconfig.json` files to each TypeScript workspace (apps and packages) extending the base config.
 
-- [ ] Task 0.3: Set up linting & formatting — Configure ESLint and Prettier at the repo root, with scripts wired into Turborepo.
-  - [ ] Subtask 0.3.a: Add ESLint config for TypeScript/react and node targets.
-  - [ ] Subtask 0.3.b: Add Prettier config and ignore files.
-  - [ ] Subtask 0.3.c: Add `lint` and `format` scripts at root and in apps/packages.
+- [x] Task 0.3: Set up linting & formatting — Configure ESLint and Prettier at the repo root, with scripts wired into Turborepo. _(Completed: Added root ESLint config for TS/React/Node, Prettier config and ignore files, and root lint/format scripts; installed all lint/format dependencies and validated lint runs.)_
+  - [x] Subtask 0.3.a: Add ESLint config for TypeScript/react and node targets.
+  - [x] Subtask 0.3.b: Add Prettier config and ignore files.
+  - [x] Subtask 0.3.c: Add `lint` and `format` scripts at root and in apps/packages.
 
 - [ ] Task 0.4: Define Python service tooling — Create shared Python tooling for `services/` (version, dependencies, formatting, testing).
   - [ ] Subtask 0.4.a: Choose Python version and document it.
