@@ -93,8 +93,10 @@ export interface FeedArticle {
   snappySentence: string;
   imageUrl: string | null;
   sourcePublisher: string;
+  sourceUrl: string;
   publishedAt: string;
   dateline: string;
+  slug?: string;
   categoryTag: {
     id: string;
     name: string;
@@ -106,6 +108,25 @@ export interface FeedArticle {
     displayName: string;
     slug: string;
   }>;
+}
+
+/** Extended feed article for the Browser view, includes full card fields */
+export interface BrowserFeedArticle extends FeedArticle {
+  keyTakeaways: string[];
+  buzzyTake: string | null;
+  engagementPoints: number;
+  isBookmarked: boolean;
+}
+
+/** Paginated feed response from /api/articles/feed */
+export interface FeedResponse {
+  articles: BrowserFeedArticle[];
+  cursor: string | null;
+  meta: {
+    category: string | null;
+    limit: number;
+    returnedCount: number;
+  };
 }
 
 export { API_URL };

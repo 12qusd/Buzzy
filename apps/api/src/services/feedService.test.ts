@@ -4,8 +4,12 @@
  * @module @buzzy/api/services/feedService.test
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
 import { encodeCursor, decodeCursor, fetchFeedArticles } from './feedService.js';
+
+beforeAll(() => {
+  process.env['USE_SEED_DATA'] = 'false';
+});
 
 describe('encodeCursor / decodeCursor', () => {
   it('round-trips correctly', () => {

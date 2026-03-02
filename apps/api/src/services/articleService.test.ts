@@ -4,7 +4,7 @@
  * @module @buzzy/api/services/articleService.test
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
 import {
   getArticleById,
   getTrendingArticles,
@@ -17,6 +17,10 @@ import {
 } from './articleService.js';
 
 describe('ArticleService', () => {
+  beforeAll(() => {
+    process.env['USE_SEED_DATA'] = 'false';
+  });
+
   describe('getArticleById', () => {
     it('returns null for non-existent article', async () => {
       const result = await getArticleById('nonexistent');

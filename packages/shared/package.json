@@ -21,6 +21,10 @@
     "./utils": {
       "types": "./dist/utils/index.d.ts",
       "default": "./dist/utils/index.js"
+    },
+    "./seeds": {
+      "types": "./dist/seeds/index.d.ts",
+      "default": "./dist/seeds/index.js"
     }
   },
   "scripts": {

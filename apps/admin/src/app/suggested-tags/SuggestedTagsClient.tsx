@@ -107,7 +107,7 @@ export function SuggestedTagsClient() {
 
       {/* Error state */}
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 rounded-md p-4">
+        <div className="bg-[var(--destructive)]/10 border border-[var(--destructive)]/30 text-[var(--destructive)] rounded-md p-4">
           {error}
           <Button variant="ghost" size="sm" className="ml-2" onClick={() => setError(null)}>
             Dismiss

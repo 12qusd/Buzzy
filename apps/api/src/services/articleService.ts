@@ -7,6 +7,7 @@
  */
 
 import { logger } from '../logger.js';
+import { SEED_ARTICLES, toFeedArticle } from '@buzzy/shared/seeds';
 import type { FeedArticle } from './feedService.js';
 
 /** Full article detail returned from the API */
@@ -58,6 +59,9 @@ export interface ArticleListResult {
   cursor: string | null;
 }
 
+/** Whether to use seed data (defaults to true when Firestore is not connected) */
+const useSeedData = (): boolean => process.env['USE_SEED_DATA'] !== 'false';
+
 /**
  * Fetches a single article by ID.
  *
@@ -67,11 +71,30 @@ export interface ArticleListResult {
 export async function getArticleById(articleId: string): Promise<ArticleDetail | null> {
   logger.info('Fetching article by ID', { articleId });
 
-  // TODO: Firestore read
-  // const doc = await db.collection('articles').doc(articleId).get();
-  // if (!doc.exists) return null;
-  // return mapArticleDoc(doc);
+  if (useSeedData()) {
+    const found = SEED_ARTICLES.find((a) => a.id === articleId);
+    return (found as ArticleDetail) ?? null;
+  }
 
+  // TODO: Firestore read
+  return null;
+}
+
+/**
+ * Fetches a single article by slug.
+ *
+ * @param slug - The article slug
+ * @returns Article detail or null if not found
+ */
+export async function getArticleBySlug(slug: string): Promise<ArticleDetail | null> {
+  logger.info('Fetching article by slug', { slug });
+
+  if (useSeedData()) {
+    const found = SEED_ARTICLES.find((a) => a.slug === slug);
+    return (found as ArticleDetail) ?? null;
+  }
+
+  // TODO: Firestore query by slug
   return null;
 }
 
@@ -85,16 +108,14 @@ export async function getArticleById(articleId: string): Promise<ArticleDetail |
 export async function getTrendingArticles(limit: number = 20): Promise<FeedArticle[]> {
   logger.info('Fetching trending articles', { limit });
 
-  // TODO: Firestore query
-  // const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
-  // const snapshot = await db.collection('articles')
-  //   .where('status', 'in', ['candidate', 'permanent'])
-  //   .where('publishedAt', '>=', cutoff)
-  //   .orderBy('publishedAt')
-  //   .orderBy('engagementScore', 'desc')
-  //   .limit(limit)
-  //   .get();
+  if (useSeedData()) {
+    return [...SEED_ARTICLES]
+      .sort((a, b) => b.engagementScore - a.engagementScore)
+      .slice(0, limit)
+      .map(toFeedArticle) as FeedArticle[];
+  }
 
+  // TODO: Firestore query
   return [];
 }
 
@@ -107,13 +128,14 @@ export async function getTrendingArticles(limit: number = 20): Promise<FeedArtic
 export async function getLatestArticles(limit: number = 20): Promise<FeedArticle[]> {
   logger.info('Fetching latest articles', { limit });
 
-  // TODO: Firestore query
-  // const snapshot = await db.collection('articles')
-  //   .where('status', 'in', ['candidate', 'permanent'])
-  //   .orderBy('publishedAt', 'desc')
-  //   .limit(limit)
-  //   .get();
+  if (useSeedData()) {
+    return [...SEED_ARTICLES]
+      .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+      .slice(0, limit)
+      .map(toFeedArticle) as FeedArticle[];
+  }
 
+  // TODO: Firestore query
   return [];
 }
 
@@ -132,13 +154,16 @@ export async function getArticlesByCategory(
 ): Promise<ArticleListResult> {
   logger.info('Fetching articles by category', { categorySlug, limit, hasCursor: !!cursor });
 
-  // TODO: Firestore query
-  // 1. Resolve categorySlug to categoryId via category_tags collection
-  // 2. Query articles where categoryTagId == resolved ID
-  //    .where('status', 'in', ['candidate', 'permanent'])
-  //    .orderBy('publishedAt', 'desc')
-  //    .limit(limit + 1)
+  if (useSeedData()) {
+    const articles = SEED_ARTICLES
+      .filter((a) => a.categoryTag.slug === categorySlug)
+      .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+      .slice(0, limit)
+      .map(toFeedArticle) as FeedArticle[];
+    return { articles, cursor: null };
+  }
 
+  // TODO: Firestore query
   return { articles: [], cursor: null };
 }
 
@@ -157,13 +182,16 @@ export async function getArticlesByTag(
 ): Promise<ArticleListResult> {
   logger.info('Fetching articles by tag', { tagSlug, limit, hasCursor: !!cursor });
 
-  // TODO: Firestore query
-  // 1. Resolve tagSlug to tagId via topic_tags collection
-  // 2. Query articles where topicTagIds array-contains resolved ID
-  //    .where('status', 'in', ['candidate', 'permanent'])
-  //    .orderBy('publishedAt', 'desc')
-  //    .limit(limit + 1)
+  if (useSeedData()) {
+    const articles = SEED_ARTICLES
+      .filter((a) => a.topicTags.some((t) => t.slug === tagSlug))
+      .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+      .slice(0, limit)
+      .map(toFeedArticle) as FeedArticle[];
+    return { articles, cursor: null };
+  }
 
+  // TODO: Firestore query
   return { articles: [], cursor: null };
 }
 

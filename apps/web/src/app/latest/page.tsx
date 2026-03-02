@@ -7,6 +7,8 @@
 
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { apiFetch, type FeedArticle } from '@/services/api';
+import { ArticleCard } from '@/components/ArticleCard';
 
 export const metadata: Metadata = {
   title: 'Latest Stories',
@@ -17,8 +19,13 @@ export const metadata: Metadata = {
  * Latest stories page.
  */
 export default async function LatestPage() {
-  // TODO: Fetch from API
-  // const { articles } = await apiFetch('/api/articles/latest?limit=20');
+  let articles: FeedArticle[] = [];
+  try {
+    const data = await apiFetch<{ articles: FeedArticle[] }>('/api/articles/latest?limit=20');
+    articles = data.articles;
+  } catch {
+    // API not running
+  }
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -27,12 +34,32 @@ export default async function LatestPage() {
         The most recent stories from across the web.
       </p>
 
-      <div className="bg-[var(--muted)] rounded-lg p-6 text-center text-[var(--muted-foreground)]">
-        Latest stories will appear here once the API is connected and articles are ingested.
-      </div>
+      {articles.length > 0 ? (
+        <div className="space-y-4">
+          {articles.map((article) => (
+            <ArticleCard
+              key={article.id}
+              id={article.id}
+              headline={article.headline}
+              tldr={article.tldr}
+              snappySentence={article.snappySentence}
+              imageUrl={article.imageUrl}
+              sourcePublisher={article.sourcePublisher}
+              publishedAt={article.publishedAt}
+              dateline={article.dateline}
+              categoryTag={article.categoryTag}
+              topicTags={article.topicTags}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="bg-[var(--muted)] rounded-lg p-6 text-center text-[var(--muted-foreground)]">
+          Latest stories will appear here once the API is connected and articles are ingested.
+        </div>
+      )}
 
       <div className="mt-8">
-        <Link href="/" className="text-sm text-[var(--primary)]">&larr; Back to Homepage</Link>
+        <Link href="/" className="text-sm text-[var(--primary)] hover:underline">&larr; Back to Homepage</Link>
       </div>
     </div>
   );

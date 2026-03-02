@@ -8,6 +8,8 @@
 
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { apiFetch, type FeedArticle } from '@/services/api';
+import { ArticleCard } from '@/components/ArticleCard';
 
 interface Props {
   params: { slug: string };
@@ -20,8 +22,6 @@ interface Props {
  * @returns Next.js metadata
  */
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  // TODO: Fetch from API
-  // const { tag } = await apiFetch(`/api/tags/${params.slug}`);
   const displayName = params.slug.split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 
   return {
@@ -41,12 +41,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  * @param props - Page props with slug param
  */
 export default async function TopicPage({ params }: Props) {
-  // TODO: Fetch from API
-  // const { tag } = await apiFetch(`/api/tags/${params.slug}`);
-  // const { articles } = await apiFetch(`/api/articles/tag/${params.slug}?limit=20`);
-  // if (!tag) notFound();
-
   const displayName = params.slug.split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+
+  let articles: FeedArticle[] = [];
+  try {
+    const data = await apiFetch<{ articles: FeedArticle[] }>(`/api/articles/tag/${params.slug}?limit=20`);
+    articles = data.articles;
+  } catch {
+    // API not running
+  }
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -54,11 +57,10 @@ export default async function TopicPage({ params }: Props) {
       <section className="mb-8">
         <h1 className="text-3xl font-bold mb-2">{displayName}</h1>
         <p className="text-[var(--muted-foreground)] mb-4">
-          Stories tagged with &ldquo;{displayName}&rdquo; will appear here once the API is connected.
+          Stories tagged with &ldquo;{displayName}&rdquo;
         </p>
         <div className="flex gap-4 text-sm text-[var(--muted-foreground)]">
-          <span>0 followers</span>
-          <span>0 articles</span>
+          <span>{articles.length} articles</span>
         </div>
       </section>
 
@@ -72,23 +74,35 @@ export default async function TopicPage({ params }: Props) {
         </button>
       </section>
 
-      {/* Related stories placeholder */}
+      {/* Related stories */}
       <section className="mb-8">
         <h2 className="text-xl font-bold mb-4">Latest Stories</h2>
-        <div className="bg-[var(--muted)] rounded-lg p-6 text-center text-[var(--muted-foreground)]">
-          No stories yet. Articles about {displayName} will appear here.
-        </div>
+        {articles.length > 0 ? (
+          <div className="space-y-4">
+            {articles.map((article) => (
+              <ArticleCard
+                key={article.id}
+                id={article.id}
+                headline={article.headline}
+                tldr={article.tldr}
+                snappySentence={article.snappySentence}
+                imageUrl={article.imageUrl}
+                sourcePublisher={article.sourcePublisher}
+                publishedAt={article.publishedAt}
+                dateline={article.dateline}
+                categoryTag={article.categoryTag}
+                topicTags={article.topicTags}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="bg-[var(--muted)] rounded-lg p-6 text-center text-[var(--muted-foreground)]">
+            No stories yet. Articles about {displayName} will appear here.
+          </div>
+        )}
       </section>
 
-      {/* Related tags placeholder */}
-      <section className="mb-8">
-        <h2 className="text-xl font-bold mb-4">Related Topics</h2>
-        <div className="bg-[var(--muted)] rounded-lg p-6 text-center text-[var(--muted-foreground)]">
-          Related topics will appear here once tag relationships are configured.
-        </div>
-      </section>
-
-      <Link href="/" className="text-sm text-[var(--primary)]">&larr; Back to Homepage</Link>
+      <Link href="/" className="text-sm text-[var(--primary)] hover:underline">&larr; Back to Homepage</Link>
     </div>
   );
 }

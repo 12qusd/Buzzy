@@ -14,6 +14,7 @@
  */
 
 import { logger } from '../logger.js';
+import { buildSeedHomepage } from '@buzzy/shared/seeds';
 
 /** A story in a content clump */
 export interface ClumpStory {
@@ -54,6 +55,9 @@ export interface HomepageFeed {
   generatedAt: string;
 }
 
+/** Whether to use seed data (defaults to true when Firestore is not connected) */
+const useSeedData = (): boolean => process.env['USE_SEED_DATA'] !== 'false';
+
 /**
  * Builds the personalized homepage feed with content clumps.
  * Enforces the "no tag soup" rule: max 1 Content Clump per tag.
@@ -73,6 +77,10 @@ export async function buildHomepageFeed(
     followedTags: followedTagIds.length,
     followedCategories: followedCategoryIds.length,
   });
+
+  if (useSeedData()) {
+    return buildSeedHomepage() as HomepageFeed;
+  }
 
   const clumps: ContentClump[] = [];
   const usedTagIds = new Set<string>();

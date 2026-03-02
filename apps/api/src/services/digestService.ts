@@ -7,6 +7,7 @@
  */
 
 import { logger } from '../logger.js';
+import { SEED_DIGEST } from '@buzzy/shared/seeds';
 
 /** Daily digest as returned from the API */
 export interface DigestDTO {
@@ -34,6 +35,9 @@ export interface DigestDTO {
   isPublic: boolean;
 }
 
+/** Whether to use seed data (defaults to true when Firestore is not connected) */
+const useSeedData = (): boolean => process.env['USE_SEED_DATA'] !== 'false';
+
 /**
  * Fetches the latest published daily digest.
  *
@@ -42,15 +46,11 @@ export interface DigestDTO {
 export async function getLatestDigest(): Promise<DigestDTO | null> {
   logger.info('Fetching latest digest');
 
-  // TODO: Firestore query
-  // const snapshot = await db.collection('daily_digests')
-  //   .where('isPublic', '==', true)
-  //   .orderBy('date', 'desc')
-  //   .limit(1)
-  //   .get();
-  // if (snapshot.empty) return null;
-  // return mapDigestDoc(snapshot.docs[0]);
+  if (useSeedData()) {
+    return SEED_DIGEST as DigestDTO;
+  }
 
+  // TODO: Firestore query
   return null;
 }
 
@@ -69,11 +69,13 @@ export async function getDigestByDate(date: string): Promise<DigestDTO | null> {
     return null;
   }
 
-  // TODO: Firestore read
-  // The digest ID is the date string (e.g., "2026-03-01")
-  // const doc = await db.collection('daily_digests').doc(date).get();
-  // if (!doc.exists) return null;
-  // return mapDigestDoc(doc);
+  if (useSeedData()) {
+    if (date === SEED_DIGEST.date) {
+      return SEED_DIGEST as DigestDTO;
+    }
+    return null;
+  }
 
+  // TODO: Firestore read
   return null;
 }

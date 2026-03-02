@@ -8,6 +8,8 @@
 
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { apiFetch, type FeedArticle } from '@/services/api';
+import { ArticleCard } from '@/components/ArticleCard';
 
 /** Category configs for lookup */
 const CATEGORIES: Record<string, { name: string; color: string; description: string }> = {
@@ -76,7 +78,7 @@ export default async function CategoryPage({ params }: Props) {
         </p>
         <Link
           href="/"
-          className="px-6 py-2 bg-[var(--primary)] text-white rounded-lg font-medium hover:opacity-90 hover:no-underline inline-block"
+          className="px-6 py-2 bg-[var(--primary)] text-white rounded-lg font-medium hover:opacity-90 inline-block"
         >
           Back to Homepage
         </Link>
@@ -84,8 +86,13 @@ export default async function CategoryPage({ params }: Props) {
     );
   }
 
-  // TODO: Fetch from API
-  // const { articles } = await apiFetch(`/api/articles/category/${params.categorySlug}?limit=20`);
+  let articles: FeedArticle[] = [];
+  try {
+    const data = await apiFetch<{ articles: FeedArticle[] }>(`/api/articles/category/${params.categorySlug}?limit=20`);
+    articles = data.articles;
+  } catch {
+    // API not running
+  }
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -112,23 +119,35 @@ export default async function CategoryPage({ params }: Props) {
         </button>
       </section>
 
-      {/* Articles placeholder */}
+      {/* Articles */}
       <section className="mb-8">
         <h2 className="text-xl font-bold mb-4">Latest in {cat.name}</h2>
-        <div className="bg-[var(--muted)] rounded-lg p-6 text-center text-[var(--muted-foreground)]">
-          Articles will appear here once the ingestion pipeline and API are connected.
-        </div>
+        {articles.length > 0 ? (
+          <div className="space-y-4">
+            {articles.map((article) => (
+              <ArticleCard
+                key={article.id}
+                id={article.id}
+                headline={article.headline}
+                tldr={article.tldr}
+                snappySentence={article.snappySentence}
+                imageUrl={article.imageUrl}
+                sourcePublisher={article.sourcePublisher}
+                publishedAt={article.publishedAt}
+                dateline={article.dateline}
+                categoryTag={article.categoryTag}
+                topicTags={article.topicTags}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="bg-[var(--muted)] rounded-lg p-6 text-center text-[var(--muted-foreground)]">
+            Articles will appear here once the ingestion pipeline and API are connected.
+          </div>
+        )}
       </section>
 
-      {/* Topic tags for this category placeholder */}
-      <section className="mb-8">
-        <h2 className="text-xl font-bold mb-4">Popular Topics in {cat.name}</h2>
-        <div className="bg-[var(--muted)] rounded-lg p-6 text-center text-[var(--muted-foreground)]">
-          Topic tags for {cat.name} will appear here.
-        </div>
-      </section>
-
-      <Link href="/" className="text-sm text-[var(--primary)]">&larr; Back to Homepage</Link>
+      <Link href="/" className="text-sm text-[var(--primary)] hover:underline">&larr; Back to Homepage</Link>
     </div>
   );
 }

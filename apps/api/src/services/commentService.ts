@@ -8,6 +8,7 @@
  */
 
 import { logger } from '../logger.js';
+import { SEED_COMMENTS } from '@buzzy/shared/seeds';
 
 /** Input for creating a comment */
 export interface CreateCommentInput {
@@ -42,6 +43,9 @@ export interface CommentListResult {
   cursor: string | null;
 }
 
+/** Whether to use seed data (defaults to true when Firestore is not connected) */
+const useSeedData = (): boolean => process.env['USE_SEED_DATA'] !== 'false';
+
 /**
  * Fetches comments for an article with cursor-based pagination.
  *
@@ -59,13 +63,12 @@ export async function getArticleComments(
 ): Promise<CommentListResult> {
   logger.info('Fetching article comments', { articleId, limit, hasCursor: !!cursor });
 
-  // TODO: Firestore query
-  // const commentsRef = db.collection('articles').doc(articleId).collection('comments')
-  //   .orderBy('createdAt', 'desc')
-  //   .limit(limit + 1);
-  // if (cursor) commentsRef.startAfter(new Date(cursor));
-  // const snapshot = await commentsRef.get();
+  if (useSeedData()) {
+    const comments = (SEED_COMMENTS[articleId] ?? []) as CommentDTO[];
+    return { comments, total: comments.length, cursor: null };
+  }
 
+  // TODO: Firestore query
   return { comments: [], total: 0, cursor: null };
 }
 

@@ -40,7 +40,7 @@ export default async function RssSourcesPage() {
             <CardTitle>Active</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-green-600">{activeCount}</p>
+            <p className="text-3xl font-bold text-[var(--success)]">{activeCount}</p>
           </CardContent>
         </Card>
         <Card>
@@ -48,7 +48,7 @@ export default async function RssSourcesPage() {
             <CardTitle>Inactive</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-gray-400">{sources.length - activeCount}</p>
+            <p className="text-3xl font-bold text-[var(--muted-foreground)]">{sources.length - activeCount}</p>
           </CardContent>
         </Card>
       </div>

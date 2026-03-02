@@ -8,10 +8,21 @@
 
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import type { ArticlePageData } from '@/services/api';
+import { apiFetch, type ArticlePageData } from '@/services/api';
 
 interface Props {
   params: { slug: string };
+}
+
+/** Comment shape from the API */
+interface Comment {
+  id: string;
+  username: string;
+  displayName: string;
+  content: string;
+  likeCount: number;
+  isTopTake: boolean;
+  createdAt: string;
 }
 
 /**
@@ -21,21 +32,38 @@ interface Props {
  * @returns Next.js metadata
  */
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  // TODO: Fetch article from API and generate real metadata
-  // const { article } = await apiFetch<{ article: ArticlePageData }>(`/api/articles/by-slug/${params.slug}`);
-
-  return {
-    title: `Article — ${params.slug}`,
-    description: 'Read the full story on Buzzy Today.',
-    openGraph: {
-      type: 'article',
-      siteName: 'Buzzy Today',
-    },
-    twitter: {
-      card: 'summary_large_image',
-      site: '@buzzytoday',
-    },
-  };
+  try {
+    let article: ArticlePageData;
+    try {
+      const res = await apiFetch<{ article: ArticlePageData }>(`/api/articles/by-slug/${params.slug}`);
+      article = res.article;
+    } catch {
+      const res = await apiFetch<{ article: ArticlePageData }>(`/api/articles/${params.slug}`);
+      article = res.article;
+    }
+    return {
+      title: article.headline,
+      description: article.metaDescription || article.tldr,
+      openGraph: {
+        type: 'article',
+        siteName: 'Buzzy Today',
+        title: article.headline,
+        description: article.tldr,
+        images: article.imageUrl ? [article.imageUrl] : undefined,
+      },
+      twitter: {
+        card: 'summary_large_image',
+        site: '@buzzytoday',
+        title: article.headline,
+        description: article.tldr,
+      },
+    };
+  } catch {
+    return {
+      title: `Article — ${params.slug}`,
+      description: 'Read the full story on Buzzy Today.',
+    };
+  }
 }
 
 /**
@@ -43,7 +71,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  *
  * @param props - Article data
  */
-function ArticleContent({ article }: { article: ArticlePageData }) {
+function ArticleContent({ article, comments }: { article: ArticlePageData; comments: Comment[] }) {
   return (
     <article className="max-w-3xl mx-auto">
       {/* Schema.org JSON-LD */}
@@ -58,7 +86,7 @@ function ArticleContent({ article }: { article: ArticlePageData }) {
       <div className="mb-4">
         <Link
           href={`/${article.categoryTag.slug}`}
-          className="inline-block px-3 py-1 rounded-full text-white text-xs font-medium hover:opacity-80 hover:no-underline"
+          className="inline-block px-3 py-1 rounded-full text-white text-xs font-medium hover:opacity-80"
           style={{ backgroundColor: article.categoryTag.color }}
         >
           {article.categoryTag.name}
@@ -126,7 +154,7 @@ function ArticleContent({ article }: { article: ArticlePageData }) {
             <Link
               key={tag.id}
               href={`/topics/${tag.slug}`}
-              className="px-3 py-1 rounded-full border border-[var(--border)] text-sm text-[var(--muted-foreground)] hover:bg-[var(--muted)] hover:no-underline"
+              className="px-3 py-1 rounded-full border border-[var(--border)] text-sm text-[var(--muted-foreground)] hover:bg-[var(--muted)]"
             >
               {tag.displayName}
             </Link>
@@ -151,6 +179,35 @@ function ArticleContent({ article }: { article: ArticlePageData }) {
         <span>{article.commentCount.toLocaleString()} comments</span>
         <span>{article.shareCount.toLocaleString()} shares</span>
       </section>
+
+      {/* Comments section */}
+      {comments.length > 0 && (
+        <section className="mt-8">
+          <h2 className="text-lg font-bold mb-4">Comments ({comments.length})</h2>
+          <div className="space-y-4">
+            {comments.map((comment) => (
+              <div
+                key={comment.id}
+                className={`p-4 rounded-lg border ${comment.isTopTake ? 'border-[var(--primary)] bg-[var(--primary)]/5' : 'border-[var(--border)]'}`}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="font-semibold text-sm">{comment.displayName}</span>
+                  <span className="text-xs text-[var(--muted-foreground)]">@{comment.username}</span>
+                  {comment.isTopTake && (
+                    <span className="px-2 py-0.5 rounded-full bg-[var(--primary)] text-white text-xs font-medium">
+                      Top Take
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm mb-2">{comment.content}</p>
+                <div className="text-xs text-[var(--muted-foreground)]">
+                  {comment.likeCount} likes
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
     </article>
   );
 }
@@ -161,26 +218,46 @@ function ArticleContent({ article }: { article: ArticlePageData }) {
  * @param props - Page props with slug param
  */
 export default async function ArticlePage({ params }: Props) {
-  // TODO: Fetch article from API once connected
-  // const res = await apiFetch<{ article: ArticlePageData | null }>(`/api/articles/by-slug/${params.slug}`);
-  // if (res.article) return <ArticleContent article={res.article} />;
+  try {
+    let article: ArticlePageData | null = null;
 
-  return (
-    <div className="max-w-3xl mx-auto py-12 text-center">
-      <h1 className="text-2xl font-bold mb-4">Article Not Found</h1>
-      <p className="text-[var(--muted-foreground)] mb-6">
-        This article doesn&apos;t exist yet. The article detail page will display full content
-        with TL;DR, key takeaways, buzzy take, and SEO metadata once the API is connected.
-      </p>
-      <p className="text-sm text-[var(--muted-foreground)] mb-6">
-        Requested slug: <code className="bg-[var(--muted)] px-2 py-1 rounded">{params.slug}</code>
-      </p>
-      <Link
-        href="/"
-        className="px-6 py-2 bg-[var(--primary)] text-white rounded-lg font-medium hover:opacity-90 hover:no-underline inline-block"
-      >
-        Back to Homepage
-      </Link>
-    </div>
-  );
+    // Try by slug first, then by ID as fallback
+    try {
+      const slugRes = await apiFetch<{ article: ArticlePageData }>(`/api/articles/by-slug/${params.slug}`);
+      article = slugRes.article;
+    } catch {
+      const idRes = await apiFetch<{ article: ArticlePageData }>(`/api/articles/${params.slug}`);
+      article = idRes.article;
+    }
+
+    if (!article) throw new Error('Not found');
+
+    let comments: Comment[] = [];
+    try {
+      const commentData = await apiFetch<{ comments: Comment[] }>(`/api/articles/${article.id}/comments?limit=20`);
+      comments = commentData.comments;
+    } catch {
+      // Comments fetch failed — render without
+    }
+
+    return <ArticleContent article={article} comments={comments} />;
+  } catch {
+    return (
+      <div className="max-w-3xl mx-auto py-12 text-center">
+        <h1 className="text-2xl font-bold mb-4">Article Not Found</h1>
+        <p className="text-[var(--muted-foreground)] mb-6">
+          This article doesn&apos;t exist yet or the API is not running.
+        </p>
+        <p className="text-sm text-[var(--muted-foreground)] mb-6">
+          Requested slug: <code className="bg-[var(--muted)] px-2 py-1 rounded">{params.slug}</code>
+        </p>
+        <Link
+          href="/"
+          className="px-6 py-2 bg-[var(--primary)] text-white rounded-lg font-medium hover:opacity-90 inline-block"
+        >
+          Back to Homepage
+        </Link>
+      </div>
+    );
+  }
 }

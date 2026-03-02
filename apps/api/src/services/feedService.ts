@@ -9,6 +9,7 @@
  */
 
 import { logger } from '../logger.js';
+import { SEED_ARTICLES, toFeedArticle } from '@buzzy/shared/seeds';
 
 /** Feed query options */
 export interface FeedOptions {
@@ -59,6 +60,9 @@ export interface FeedResult {
     limit: number;
   };
 }
+
+/** Whether to use seed data (defaults to true when Firestore is not connected) */
+const useSeedData = (): boolean => process.env['USE_SEED_DATA'] !== 'false';
 
 /**
  * Encodes a pagination cursor from score and article ID.
@@ -114,6 +118,23 @@ export async function fetchFeedArticles(options: FeedOptions): Promise<FeedResul
     hasUser: !!userId,
   });
 
+  if (useSeedData()) {
+    let articles = [...SEED_ARTICLES];
+    if (category) {
+      articles = articles.filter((a) => a.categoryTag.slug === category);
+    }
+    const feedArticles = articles
+      .sort((a, b) => b.engagementScore - a.engagementScore)
+      .slice(0, limit)
+      .map(toFeedArticle) as FeedArticle[];
+
+    return {
+      articles: feedArticles,
+      cursor: null,
+      meta: { category: category ?? null, limit },
+    };
+  }
+
   // Decode cursor if present
   if (cursor) {
     const decoded = decodeCursor(cursor);
@@ -124,17 +145,6 @@ export async function fetchFeedArticles(options: FeedOptions): Promise<FeedResul
   }
 
   // TODO: Firestore query
-  // const articlesRef = db.collection('articles')
-  //   .where('status', 'in', ['candidate', 'permanent'])
-  //   .orderBy('rankingScore', 'desc')
-  //   .orderBy('publishedAt', 'desc')
-  //   .limit(limit + 1); // +1 to check if there's a next page
-  //
-  // if (category) {
-  //   articlesRef.where('categoryTag.slug', '==', category);
-  // }
-
-  // Placeholder response
   const articles: FeedArticle[] = [];
   const hasMore = false;
   const nextCursor = hasMore && articles.length > 0

@@ -9,6 +9,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import './globals.css';
+import { ThemeProvider, themeScript } from '@/components/ThemeProvider';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export const metadata: Metadata = {
   title: {
@@ -49,84 +51,95 @@ const CATEGORIES = [
  */
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body className="min-h-screen flex flex-col">
-        {/* Header */}
-        <header className="border-b border-[var(--border)] bg-white sticky top-0 z-50">
-          <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-            <Link href="/" className="text-2xl font-bold text-[var(--primary)] hover:no-underline">
-              Buzzy Today
-            </Link>
-            <nav className="hidden md:flex items-center gap-4 text-sm">
-              <Link href="/trending" className="text-[var(--muted-foreground)] hover:text-[var(--foreground)]">
-                Trending
+        <ThemeProvider>
+          {/* Header */}
+          <header className="border-b border-[var(--border)] bg-[var(--background)] sticky top-0 z-50">
+            <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+              <Link href="/" className="text-2xl font-bold text-[var(--primary)]">
+                Buzzy Today
               </Link>
-              <Link href="/latest" className="text-[var(--muted-foreground)] hover:text-[var(--foreground)]">
-                Latest
-              </Link>
-              <Link href="/digest" className="text-[var(--muted-foreground)] hover:text-[var(--foreground)]">
-                Daily Digest
-              </Link>
-            </nav>
-          </div>
-
-          {/* Category bar */}
-          <div className="max-w-7xl mx-auto px-4 pb-2 overflow-x-auto">
-            <div className="flex gap-3 text-sm">
-              {CATEGORIES.map((cat) => (
-                <Link
-                  key={cat.slug}
-                  href={`/${cat.slug}`}
-                  className="whitespace-nowrap px-3 py-1 rounded-full text-white text-xs font-medium hover:opacity-80 hover:no-underline transition-opacity"
-                  style={{ backgroundColor: cat.color }}
-                >
-                  {cat.name}
-                </Link>
-              ))}
-            </div>
-          </div>
-        </header>
-
-        {/* Main content */}
-        <main className="flex-1 max-w-7xl mx-auto px-4 py-6 w-full">
-          {children}
-        </main>
-
-        {/* Footer */}
-        <footer className="border-t border-[var(--border)] bg-[var(--muted)] mt-auto">
-          <div className="max-w-7xl mx-auto px-4 py-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div>
-                <h3 className="font-bold mb-2">Buzzy Today</h3>
-                <p className="text-sm text-[var(--muted-foreground)]">
-                  News without the noise. AI-summarized stories delivered fast.
-                </p>
-              </div>
-              <div>
-                <h3 className="font-bold mb-2">Categories</h3>
-                <div className="grid grid-cols-2 gap-1 text-sm">
-                  {CATEGORIES.map((cat) => (
-                    <Link key={cat.slug} href={`/${cat.slug}`} className="text-[var(--muted-foreground)]">
-                      {cat.name}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <h3 className="font-bold mb-2">Links</h3>
-                <div className="flex flex-col gap-1 text-sm">
-                  <Link href="/about" className="text-[var(--muted-foreground)]">About</Link>
-                  <Link href="/digest" className="text-[var(--muted-foreground)]">Daily Digest</Link>
-                  <Link href="/privacy" className="text-[var(--muted-foreground)]">Privacy Policy</Link>
-                  <Link href="/terms" className="text-[var(--muted-foreground)]">Terms of Service</Link>
-                </div>
+              <div className="flex items-center gap-4 text-sm">
+                <nav className="hidden md:flex items-center gap-4">
+                  <Link href="/browser" className="text-[var(--foreground)] font-medium hover:text-[var(--primary)] transition-colors">
+                    Browse
+                  </Link>
+                  <Link href="/trending" className="text-[var(--foreground)] font-medium hover:text-[var(--primary)] transition-colors">
+                    Trending
+                  </Link>
+                  <Link href="/latest" className="text-[var(--foreground)] font-medium hover:text-[var(--primary)] transition-colors">
+                    Latest
+                  </Link>
+                  <Link href="/digest" className="text-[var(--foreground)] font-medium hover:text-[var(--primary)] transition-colors">
+                    Daily Digest
+                  </Link>
+                </nav>
+                <ThemeToggle />
               </div>
             </div>
-            <p className="text-xs text-[var(--muted-foreground)] mt-6 text-center">
-              &copy; {new Date().getFullYear()} Buzzy Today. All rights reserved.
-            </p>
-          </div>
-        </footer>
+
+            {/* Category bar */}
+            <div className="max-w-7xl mx-auto px-4 pb-2 overflow-x-auto">
+              <div className="flex gap-3 text-sm">
+                {CATEGORIES.map((cat) => (
+                  <Link
+                    key={cat.slug}
+                    href={`/${cat.slug}`}
+                    className="whitespace-nowrap px-3 py-1 rounded-full text-white text-xs font-medium hover:opacity-80 transition-opacity"
+                    style={{ backgroundColor: cat.color }}
+                  >
+                    {cat.name}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </header>
+
+          {/* Main content */}
+          <main className="flex-1 max-w-7xl mx-auto px-4 py-6 w-full">
+            {children}
+          </main>
+
+          {/* Footer */}
+          <footer className="border-t border-[var(--border)] bg-[var(--muted)] mt-auto">
+            <div className="max-w-7xl mx-auto px-4 py-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                  <h3 className="font-bold mb-2">Buzzy Today</h3>
+                  <p className="text-sm text-[var(--muted-foreground)]">
+                    News without the noise. AI-summarized stories delivered fast.
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-bold mb-2">Categories</h3>
+                  <div className="grid grid-cols-2 gap-1 text-sm">
+                    {CATEGORIES.map((cat) => (
+                      <Link key={cat.slug} href={`/${cat.slug}`} className="text-[var(--muted-foreground)]">
+                        {cat.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <h3 className="font-bold mb-2">Links</h3>
+                  <div className="flex flex-col gap-1 text-sm">
+                    <Link href="/about" className="text-[var(--muted-foreground)] hover:text-[var(--foreground)]">About</Link>
+                    <Link href="/digest" className="text-[var(--muted-foreground)] hover:text-[var(--foreground)]">Daily Digest</Link>
+                    <Link href="/privacy" className="text-[var(--muted-foreground)] hover:text-[var(--foreground)]">Privacy Policy</Link>
+                    <Link href="/terms" className="text-[var(--muted-foreground)] hover:text-[var(--foreground)]">Terms of Service</Link>
+                  </div>
+                </div>
+              </div>
+              <p className="text-xs text-[var(--muted-foreground)] mt-6 text-center">
+                &copy; {new Date().getFullYear()} Buzzy Today. All rights reserved.
+              </p>
+            </div>
+          </footer>
+        </ThemeProvider>
       </body>
     </html>
   );

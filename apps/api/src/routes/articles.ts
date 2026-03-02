@@ -12,7 +12,7 @@ import { feedQuerySchema, articleActionSchema, bookmarkSchema } from '../validat
 import { createCommentSchema, commentListSchema } from '../validators/comments.validators.js';
 import { fetchFeedArticles } from '../services/feedService.js';
 import { buildHomepageFeed } from '../services/contentClumpService.js';
-import { getArticleById, getArticlesByCategory, getArticlesByTag, getTrendingArticles, getLatestArticles, toggleArticleLike, recordArticleShare, toggleArticleBookmark } from '../services/articleService.js';
+import { getArticleById, getArticleBySlug, getArticlesByCategory, getArticlesByTag, getTrendingArticles, getLatestArticles, toggleArticleLike, recordArticleShare, toggleArticleBookmark } from '../services/articleService.js';
 import { getArticleComments, createComment } from '../services/commentService.js';
 import { logger } from '../logger.js';
 
@@ -82,6 +82,19 @@ export async function articleRoutes(server: FastifyInstance): Promise<void> {
 
     const result = await getArticlesByTag(tagSlug, query.limit, query.cursor);
     return { ...result, tag: tagSlug };
+  });
+
+  /** GET /api/articles/by-slug/:slug — Single article by slug */
+  server.get<{ Params: { slug: string } }>('/by-slug/:slug', async (request, reply) => {
+    const { slug } = request.params;
+    logger.info('Fetching article by slug', { slug });
+
+    const article = await getArticleBySlug(slug);
+    if (!article) {
+      void reply.status(404);
+      return { error: { message: 'Article not found', code: 'NOT_FOUND', statusCode: 404 } };
+    }
+    return { article };
   });
 
   /** GET /api/articles/:id/comments — List comments for an article */
