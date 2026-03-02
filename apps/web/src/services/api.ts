@@ -7,6 +7,9 @@
 
 const API_URL = process.env['BUZZY_API_URL'] ?? 'http://localhost:3001';
 
+/** Client-safe API URL (available in browser via NEXT_PUBLIC_ prefix) */
+const CLIENT_API_URL = process.env['NEXT_PUBLIC_API_URL'] ?? 'http://localhost:3001';
+
 /**
  * Fetches data from the Buzzy API.
  *
@@ -125,8 +128,7 @@ export interface FeedResponse {
   meta: {
     category: string | null;
     limit: number;
-    returnedCount: number;
   };
 }
 
-export { API_URL };
+export { API_URL, CLIENT_API_URL };
