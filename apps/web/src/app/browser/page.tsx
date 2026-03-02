@@ -25,7 +25,7 @@ const PAGE_SIZE = 20;
 export default function BrowserPage() {
   const [articles, setArticles] = useState<BrowserFeedArticle[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
@@ -194,23 +194,20 @@ export default function BrowserPage() {
   }, []);
 
   return (
-    <div className="fixed inset-0 flex flex-col bg-[var(--background)]">
+    <div className="-mx-4 -mt-6">
       {/* Sticky category filter */}
-      <div className="shrink-0 z-10">
+      <div className="sticky top-0 z-20">
         <CategoryFilterBar
           selectedCategory={categoryFilter}
           onSelect={handleCategoryChange}
         />
       </div>
 
-      {/* Scroll-snap feed container */}
-      <div
-        ref={containerRef}
-        className="flex-1 overflow-y-auto snap-y snap-mandatory"
-      >
+      {/* Feed container */}
+      <div ref={containerRef}>
         {/* Error state */}
         {error && articles.length === 0 && (
-          <div className="flex items-center justify-center h-full">
+          <div className="flex items-center justify-center min-h-[60vh]">
             <div className="text-center p-8">
               <p className="text-[var(--destructive)] mb-4">{error}</p>
               <button
@@ -225,7 +222,7 @@ export default function BrowserPage() {
 
         {/* Loading state (initial) */}
         {loading && articles.length === 0 && (
-          <div className="flex items-center justify-center h-full">
+          <div className="flex items-center justify-center min-h-[60vh]">
             <div className="text-center">
               <div className="inline-block w-8 h-8 border-4 border-[var(--border)] border-t-[var(--primary)] rounded-full animate-spin mb-4" />
               <p className="text-[var(--muted-foreground)]">Loading stories...</p>
@@ -235,7 +232,7 @@ export default function BrowserPage() {
 
         {/* Empty state */}
         {!loading && !error && articles.length === 0 && (
-          <div className="flex items-center justify-center h-full">
+          <div className="flex items-center justify-center min-h-[60vh]">
             <p className="text-[var(--muted-foreground)] text-lg">No stories yet</p>
           </div>
         )}
@@ -246,7 +243,6 @@ export default function BrowserPage() {
             key={article.id}
             ref={(el) => setCardRef(index, el)}
             data-index={index}
-            className="snap-start"
           >
             <BrowserStoryCard article={article} />
           </div>
@@ -256,7 +252,7 @@ export default function BrowserPage() {
         {hasMore && (
           <div ref={sentinelRef} className="flex items-center justify-center py-8">
             {loading && (
-              <div className="inline-block w-6 h-6 border-3 border-[var(--border)] border-t-[var(--primary)] rounded-full animate-spin" />
+              <div className="inline-block w-6 h-6 border-4 border-[var(--border)] border-t-[var(--primary)] rounded-full animate-spin" />
             )}
           </div>
         )}
