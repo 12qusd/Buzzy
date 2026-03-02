@@ -21,10 +21,10 @@ Each task is small enough to complete in a focused session, ordered by dependenc
   - [x] Subtask 0.3.b: Add Prettier config and ignore files.
   - [x] Subtask 0.3.c: Add `lint` and `format` scripts at root and in apps/packages.
 
-- [ ] Task 0.4: Define Python service tooling — Create shared Python tooling for `services/` (version, dependencies, formatting, testing).
-  - [ ] Subtask 0.4.a: Choose Python version and document it.
-  - [ ] Subtask 0.4.b: Add shared `requirements.txt` or `pyproject.toml` for ingestion and summarization services.
-  - [ ] Subtask 0.4.c: Add basic formatting (e.g., Black) and testing (e.g., pytest) configuration.
+- [x] Task 0.4: Define Python service tooling — Create shared Python tooling for `services/` (version, dependencies, formatting, testing). _(Completed: Standardized on Python 3.12, added root `pyproject.toml` with Black and pytest config targeting `services/`, created `services/requirements.txt` with shared runtime/dev deps, and documented Python setup and commands in `services/README.md`.)_
+  - [x] Subtask 0.4.a: Choose Python version and document it.
+  - [x] Subtask 0.4.b: Add shared `requirements.txt` or `pyproject.toml` for ingestion and summarization services.
+  - [x] Subtask 0.4.c: Add basic formatting (e.g., Black) and testing (e.g., pytest) configuration.
 
 - [ ] Task 0.5: Expand core documentation — Update `README.md` and create a basic `docs/` structure describing architecture and local development.
   - [ ] Subtask 0.5.a: Document monorepo layout (`apps/`, `packages/`, `services/`) and technology choices (TypeScript + Firebase Firestore + Python services).
