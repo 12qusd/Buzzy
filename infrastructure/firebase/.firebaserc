@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "staging": "buzzy-today-staging",
+    "production": "buzzy-today-prod"
+  },
+  "targets": {}
+}

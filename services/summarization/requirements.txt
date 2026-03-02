@@ -1,0 +1,8 @@
+# Buzzy Today — Summarization Service Dependencies
+openai==1.82.0
+google-cloud-firestore==2.20.1
+firebase-admin==6.6.0
+structlog==25.1.0
+python-dotenv==1.1.0
+pytest==8.3.5
+pytest-asyncio==0.25.3

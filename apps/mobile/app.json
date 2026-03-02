@@ -1,0 +1,24 @@
+{
+  "expo": {
+    "name": "Buzzy Today",
+    "slug": "buzzy-today",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "buzzy",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.buzzytoday.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#3C82F6"
+      },
+      "package": "com.buzzytoday.app"
+    },
+    "plugins": [
+      "expo-router"
+    ]
+  }
+}

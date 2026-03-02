@@ -1,0 +1,62 @@
+/**
+ * All valid Topic Tag type values (bucket types).
+ * Defines the taxonomy classification buckets that tags are organized into.
+ *
+ * @see MVVVP — Topic Tag Requirements, Section 7
+ */
+
+import type { TopicTagType } from '../types/common.types.js';
+
+export const TOPIC_TAG_TYPES: readonly TopicTagType[] = [
+  'Person',
+  'Organization',
+  'SportsTeam',
+  'Brand',
+  'Product',
+  'Feature',
+  'Platform',
+  'Law',
+  'RecurringEvent',
+  'NotableEvent',
+  'Transaction',
+  'Concept',
+  'Technology',
+  'Trend',
+  'Metric',
+  'RiskFactor',
+  'Place',
+  'FinancialInstrument',
+  'LegalAndCourt',
+  'MediaAndCreative',
+  'Academic',
+  'Ailment',
+  'Treatment',
+  'Location',
+  'CryptoName',
+  'CryptoTicker',
+  'FiatCurrency',
+  'PublicCompanyTicker',
+  'Company',
+  'NonProfit',
+  'GovernmentAgency',
+  'CourtCase',
+  'Index',
+  'PoliticalFigure',
+  'Celebrity',
+  'Athlete',
+  'Musician',
+  'Actor',
+  'Composer',
+  'ScientificTerm',
+  'Conference',
+  'Industry',
+  'Protocol',
+  'Song',
+  'MediaTitle',
+  'Book',
+  'Movie',
+  'TVShow',
+  'ArtisticGenre',
+  'Award',
+  'HistoricalEvent',
+] as const;

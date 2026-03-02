@@ -1,0 +1,13 @@
+[
+  { "category": "News", "rssPull": "0 */2 * * *", "publishDelay": 3600 },
+  { "category": "Tech", "rssPull": "0 */6 * * *", "publishDelay": 10800 },
+  { "category": "Science", "rssPull": "0 12 * * *", "publishDelay": 21600 },
+  { "category": "Health", "rssPull": "0 18 * * *", "publishDelay": 21600 },
+  { "category": "Sports", "rssPull": "0 */6 * * *", "publishDelay": 7200 },
+  { "category": "Entertainment", "rssPull": "0 */6 * * *", "publishDelay": 21600 },
+  { "category": "Politics", "rssPull": "0 */6 * * *", "publishDelay": 7200 },
+  { "category": "Money", "rssPull": "0 */6 * * *", "publishDelay": 10800 },
+  { "category": "Markets", "rssPull": "*/30 * * * *", "publishDelay": 1800 },
+  { "category": "Crypto", "rssPull": "0 */6 * * *", "publishDelay": 10800 },
+  { "category": "Lifestyle", "rssPull": "0 */6 * * *", "publishDelay": 21600 }
+]

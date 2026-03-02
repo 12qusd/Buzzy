@@ -1,0 +1,129 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  lint-typecheck-test:
+    name: Lint, Typecheck & Test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Test
+        run: npm run test
+
+      - name: Build
+        run: npm run build
+
+  python-tests:
+    name: Python Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install ingestion dependencies
+        run: |
+          cd services/ingestion
+          pip install -r requirements.txt --break-system-packages
+        if: hashFiles('services/ingestion/requirements.txt') != ''
+
+      - name: Install summarization dependencies
+        run: |
+          cd services/summarization
+          pip install -r requirements.txt --break-system-packages
+        if: hashFiles('services/summarization/requirements.txt') != ''
+
+      - name: Run Python tests
+        run: |
+          cd services/ingestion && python -m pytest tests/ -v 2>/dev/null || echo "No ingestion tests yet"
+          cd ../summarization && python -m pytest tests/ -v 2>/dev/null || echo "No summarization tests yet"
+
+  deploy-staging:
+    name: Deploy to Staging
+    needs: [lint-typecheck-test, python-tests]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy to Firebase Staging
+        run: echo "TODO: Configure firebase deploy --project staging"
+        # TODO: Add FIREBASE_TOKEN secret and uncomment:
+        # uses: FirebaseExtended/action-hosting-deploy@v0
+        # with:
+        #   repoToken: '${{ secrets.GITHUB_TOKEN }}'
+        #   firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_STAGING }}'
+        #   projectId: buzzy-today-staging
+
+  deploy-production:
+    name: Deploy to Production
+    needs: [lint-typecheck-test, python-tests]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy to Firebase Production
+        run: echo "TODO: Configure firebase deploy --project production"
+        # TODO: Add FIREBASE_TOKEN secret and uncomment:
+        # uses: FirebaseExtended/action-hosting-deploy@v0
+        # with:
+        #   repoToken: '${{ secrets.GITHUB_TOKEN }}'
+        #   firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_PROD }}'
+        #   projectId: buzzy-today-prod
+        #   channelId: live

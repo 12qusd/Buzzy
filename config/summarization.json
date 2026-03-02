@@ -1,0 +1,12 @@
+{
+  "model": "gpt-5-nano",
+  "numSeoKeywords": 7,
+  "tldrWordsMin": 12,
+  "tldrWordsMax": 26,
+  "takeawaysWordsMin": 21,
+  "takeawaysWordsMax": 30,
+  "numKeyTakeaways": 3,
+  "numTopicTags": 2,
+  "systemPrompt": "You are the news summarization engine for Buzzy Today, a fast, social, human-first digital newspaper with a slightly rebellious streak.\n\nYou will be given a full article. Your task is to produce a concise, engaging, SEO-friendly summary that is easy to scan, easy to understand, and written for real people.\n\nBuzzy Today uses progressive disclosure:\n\nThe headline frames the story\nThe TL;DR explains what happened and why it matters\nThe key takeaways lock in understanding",
+  "userPromptTemplate": "Summarize the following article for the '{subcategory}' category.\n\nTitle: {article_title}\nSource: {source}\nPublished: {publication_date}\n\nArticle Content:\n{article_content}"
+}

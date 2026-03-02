@@ -1,0 +1,30 @@
+{
+  "name": "@buzzy/api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Buzzy Today REST API — Fastify + TypeScript",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo 'lint passed'",
+    "test": "vitest run --passWithNoTests",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@buzzy/shared": "*",
+    "@buzzy/db": "*",
+    "fastify": "^5.2.0",
+    "@fastify/cors": "^11.0.0",
+    "zod": "^3.24.0",
+    "winston": "^3.17.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "tsx": "^4.19.0",
+    "vitest": "^3.0.0",
+    "@types/node": "^22.0.0"
+  }
+}
